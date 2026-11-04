@@ -1,20 +1,17 @@
 # Peer review log
 
-The CISC7204 portfolio brief requires a classmate to review the portfolio, and an improvement
-committed in response. This file records the review, what each comment changed, and where that change
-lives in the history.
+The CISC7204 portfolio brief asks for a classmate to review the portfolio and for an improvement
+committed in response. This file records that review, the change it produced, and — separately — the
+self-review that happened before it, so the two are not confused.
 
 ## Reviewer
 
 | Field | Value |
 |---|---|
-| Reviewer | CISC7204 classmate <!-- TODO: replace with the classmate's name once they confirm --> |
-| Date of review | 2026-11-04 |
-| Material reviewed | The public portfolio site and both repositories, at the commit *before* the one that answers each comment |
-| Time budget | About 10 minutes, no explanation from me |
-
-> **Note to self before submission:** replace the reviewer row with the classmate's name and confirm
-> the date. The comments below are the review record; the name is the only field still to confirm.
+| Reviewer | **LIUZIXUAN**, CISC7204 classmate |
+| Date | 4 November 2026 |
+| Material reviewed | The published portfolio site and this repository, opened cold, with no explanation from the author |
+| Time budget | About five minutes |
 
 ## What the reviewer was asked to do
 
@@ -22,39 +19,70 @@ Three tasks, deliberately not "does it look nice":
 
 1. Find the semester project from the home page in **two clicks or fewer**, and say what its research
    question is.
-2. Open one figure and say what quantity the axes measure, including units.
-3. Say whether the analysis could be rerun from the repository alone, and where they got stuck.
+2. Open one figure and say what quantity **each axis** measures, including units.
+3. Say whether the analysis could be rerun from the repository alone.
 
-## Comments and responses
+## What the reviewer reported
 
-| # | Review comment (paraphrased) | Response | Commit |
-|---|---|---|---|
-| 1 | "The showcase only has one small project — where is the semester project?" | Rebuilt the site around the Xiamen project: research question, two figures with axis units, four findings, limitation, status, repository link | site repo, `site: rebuild portfolio around the semester project` |
-| 2 | "The charts are hotlinked from `raw.githubusercontent.com` — one branch rename and the pictures vanish." | Every image copied into `assets/img/` and committed with the site, so the pages have no external dependency | site repo, same commit (`assets/img/`) |
-| 3 | "On a phone the wide figures overflow and the tables break." | Responsive grid, fluid images with intrinsic `width`/`height`, horizontally scrollable tables, `alt` text on every figure, visible keyboard focus | site repo, `site: responsive, accessible figures and tables` |
-| 4 | "The skills table undersells what you actually did — it says pandas and matplotlib." | Rewrote it as skill **plus evidence**, each row pointing at the module that proves it | site repo, `site: rebuild portfolio around the semester project` |
-| 5 | "The figure says MAE 3.970 but your table says 3.730. Which is right?" | Both: different fold populations. The report now explains the difference in §5 and it is generated from `model_metrics.json` rather than typed by hand | this commit — `docs: explain the 3.970 vs 3.730 fold-population difference` |
-| 6 | "I could not tell what the data licence allows." | Added the licence, the CC BY-NC 4.0 attribution, the SHA-256 of the archive and an explicit "not redistributed" statement | `README.md` §4 and `data/DOWNLOAD.md` (initial commit) |
+| Task | Answer (translated from Chinese) | Verdict |
+|---|---|---|
+| 1. Find the project and state its question | "I can find the semester project, and I can tell what the research question is." | Passed |
+| 2. Read the axes and units off a figure | "The axes are longitude and latitude, and the unit is degrees." | Passed — and exposed a gap below |
+| 3. Rerun the analysis from the repository alone | "It all runs." | Passed |
 
-Comment 5 is the one that mattered most: it was a real inconsistency in presentation, not in the
-analysis, and it would have cost marks under "findings match the results shown in code and
-visualizations". The fix is a generated paragraph, so the explanation cannot drift away from the
-metrics again.
+## The improvement this produced
 
-## What was NOT changed, and why
+Task 2 was answerable for the map she happened to open. Applying the same question to the other five
+figures showed that **only two of the six captions on the project page actually stated their axes**;
+the rest described the finding and left the reader to infer what was plotted. The marking rubric asks
+for readable visualisations with clear titles, labels and units, so this was a genuine gap.
 
-The reviewer also suggested smoothing the growth curve in the Netflix project ("it looks like a
-decline"). That would hide the dataset's truncated final year, which is the most instructive thing in
-that chart. The suggestion was declined and the reason recorded here rather than silently ignored.
+Every caption on
+<https://qyyyyy123.github.io/data-science-portfolio/projects/xiamen.html> now names its x-axis, its
+y-axis and the unit of each:
+
+| Figure | Axis statement now given |
+|---|---|
+| 1 | x = ω (unitless), y = number of rides / cumulative share |
+| 2 | x = longitude (degrees), y = latitude (degrees), colour = tidal index (unitless) |
+| 3 | per slot: x = longitude (degrees), y = latitude (degrees), colour = tidal index (unitless) |
+| 4 | x = longitude (degrees), y = latitude (degrees), colour = community label |
+| 5 | x = actual pickups per 30 min (count), y = predicted pickups per 30 min (count) |
+| 6 | x = increase in MAE (pickups per 30 min), y = feature |
+
+**Commit:** `0301033` in the portfolio repository —
+<https://github.com/qyyyyy123/data-science-portfolio/commit/0301033>
+
+No number in this repository changed: `figures/`, `model_metrics.json` and the report are untouched
+by that commit.
+
+## Self-review (not peer feedback)
+
+Before the site was shown to anyone, it was checked against the marking rubric and seven issues were
+fixed. They are listed on the site's feedback page
+(<https://qyyyyy123.github.io/data-science-portfolio/feedback.html>) so that the peer review above is
+not credited with work it did not do. The two that touch this repository are:
+
+| Issue found in self-review | Fix | Commit |
+|---|---|---|
+| The prediction figure said MAE 3.970 while the metrics table said 3.730 | Both correct; different fold populations. `tools/make_report.py` now emits the explanation, computed from `model_metrics.json`, so it cannot drift again | `4a6d985` — <https://github.com/qyyyyy123/xiamen-shared-bicycle-analysis/commit/4a6d985> |
+| Nothing stated what the data licence allows | Licence, CC BY-NC 4.0 attribution, SHA-256 of the archive, explicit "not redistributed" statement | `c936ce8` (initial commit) |
+
+## One suggestion declined
+
+During self-review the idea of smoothing the Netflix growth curve came up, because it "looks like a
+decline" at the end. Declined: the apparent decline is the dataset's truncated final year (its last
+entry is 2021-09-25). Smoothing would hide the one thing that chart is most useful for — checking the
+boundary of a dataset before reading a trend into it. Recorded here rather than quietly dropped.
 
 ## Responsible sharing check
 
 Performed at the same time as the review:
 
-* No passwords, API keys, tokens or `.env` files in either repository or in `git log`.
+* No passwords, API keys, tokens or `.env` files in either repository or anywhere in `git log`.
 * No personal data: no email addresses, phone numbers, student ID in file names, or rider-level
   records. The bike-share data is event-level and contains no rider identifiers.
 * The third-party archive is **not** redistributed: it is CC BY-NC 4.0, linked via its Zenodo DOI and
   hash-verified. Only derived aggregates are committed.
-* No restricted or licensed dataset is exposed; the Netflix extract is a public snapshot and is
-  committed with its notebook.
+* No restricted or licensed dataset is exposed; the Netflix extract is a public snapshot committed
+  with its notebook.
