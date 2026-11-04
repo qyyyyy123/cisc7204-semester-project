@@ -1,0 +1,11 @@
+{
+  "n": 2905,
+  "morans_i": 0.12285995831511544,
+  "expected_i": -0.0003443526170798898,
+  "z_score": 37.714407689288954,
+  "p_value": 0.001,
+  "band_m": 500.0,
+  "n_pairs": 89614,
+  "n_permutations": 999,
+  "weighting": "binary distance band, row-standardised"
+}

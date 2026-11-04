@@ -1,0 +1,76 @@
+{
+  "n_fences": 10517,
+  "n_trips": 212680,
+  "n_endpoints": 425360,
+  "snap_radius_m": 50.0,
+  "origin_matched": 135384,
+  "dest_matched": 149889,
+  "origin_match_rate_pct": 63.656197103629864,
+  "dest_match_rate_pct": 70.47630242618018,
+  "endpoint_match_rate_pct": 67.06624976490502,
+  "polygon_containment_origin": 2593,
+  "polygon_containment_dest": 5490,
+  "snapped_origin": 132791,
+  "snapped_dest": 144399,
+  "unmatched_origin_nearest_fence": {
+    "n": 77296,
+    "median_m": 145.54767743317325,
+    "p25_m": 85.44980550556467,
+    "p75_m": 248.00129028654794
+  },
+  "unmatched_dest_nearest_fence": {
+    "n": 62791,
+    "median_m": 157.8642852472238,
+    "p25_m": 95.97396825086273,
+    "p75_m": 250.83832580309564
+  },
+  "both_end_matched": 102065,
+  "both_end_matched_pct": 47.989937934925706,
+  "unmatched_endpoints": 140087,
+  "candidate_polygon_tests": 13605,
+  "method": "matplotlib.path.Path.contains_points with a 0.002 deg grid bbox pre-filter; unmatched endpoints snap to the nearest fence centroid within 50 m",
+  "radius_sensitivity": [
+    {
+      "snap_radius_m": 0.0,
+      "origin_match_pct": 1.2192025578333647,
+      "dest_match_pct": 2.5813428625164567,
+      "endpoint_match_pct": 1.9002727101749106
+    },
+    {
+      "snap_radius_m": 25.0,
+      "origin_match_pct": 46.247884145194654,
+      "dest_match_pct": 60.47254090652624,
+      "endpoint_match_pct": 53.36021252586045
+    },
+    {
+      "snap_radius_m": 50.0,
+      "origin_match_pct": 63.656197103629864,
+      "dest_match_pct": 70.47630242618018,
+      "endpoint_match_pct": 67.06624976490502
+    },
+    {
+      "snap_radius_m": 75.0,
+      "origin_match_pct": 70.69023885649803,
+      "dest_match_pct": 75.03808538649615,
+      "endpoint_match_pct": 72.86416212149709
+    },
+    {
+      "snap_radius_m": 100.0,
+      "origin_match_pct": 75.46078615760767,
+      "dest_match_pct": 78.32518337408312,
+      "endpoint_match_pct": 76.89298476584541
+    },
+    {
+      "snap_radius_m": 150.0,
+      "origin_match_pct": 82.40878314839195,
+      "dest_match_pct": 84.30505924393455,
+      "endpoint_match_pct": 83.35692119616324
+    },
+    {
+      "snap_radius_m": 200.0,
+      "origin_match_pct": 87.74731991724657,
+      "dest_match_pct": 89.6849727289825,
+      "endpoint_match_pct": 88.71614632311454
+    }
+  ]
+}

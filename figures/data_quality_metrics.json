@@ -1,0 +1,18 @@
+{
+  "order_rows": 441350,
+  "order_coord_inside_bbox_pct": 100.0,
+  "fence_rows": 10517,
+  "fence_raw_rows": 10522,
+  "fence_unique_ids": 10517,
+  "traj_points": 2849243,
+  "traj_segments": 49326,
+  "weather_rows": 144,
+  "weather_precip_by_day": {
+    "2020-12-20": 0.0,
+    "2020-12-21": 0.0,
+    "2020-12-22": 0.0,
+    "2020-12-23": 0.0,
+    "2020-12-24": 0.0,
+    "2020-12-25": 0.0
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "our_method": {
+    "algorithm": "networkx Louvain (resolution scan + small-community merge)",
+    "resolution": 1.0,
+    "n_communities": 7,
+    "modularity": 0.7160114426730116,
+    "min_community_size": 55,
+    "community_sizes": [
+      766,
+      526,
+      383,
+      345,
+      336,
+      316,
+      89
+    ],
+    "resolution_scan": [
+      {
+        "resolution": 0.2,
+        "n_communities": 4,
+        "modularity": 0.6768913030113916
+      },
+      {
+        "resolution": 0.3,
+        "n_communities": 4,
+        "modularity": 0.6769025372654521
+      },
+      {
+        "resolution": 0.4,
+        "n_communities": 5,
+        "modularity": 0.6994412322280841
+      },
+      {
+        "resolution": 0.5,
+        "n_communities": 5,
+        "modularity": 0.7007729422751424
+      },
+      {
+        "resolution": 0.6,
+        "n_communities": 5,
+        "modularity": 0.700730375656811
+      },
+      {
+        "resolution": 0.8,
+        "n_communities": 6,
+        "modularity": 0.7152704948757034
+      },
+      {
+        "resolution": 1.0,
+        "n_communities": 7,
+        "modularity": 0.7160114426730116
+      },
+      {
+        "resolution": 1.2,
+        "n_communities": 8,
+        "modularity": 0.7112935668278915
+      },
+      {
+        "resolution": 1.5,
+        "n_communities": 9,
+        "modularity": 0.704752975431162
+      }
+    ],
+    "within_acceptance_window": true,
+    "modularity_target_met": true
+  },
+  "baseline_method": {
+    "algorithm": "paper-style affinity S^gamma * K(d) * M, PCA embedding + K-Means++",
+    "gamma": 1.0,
+    "sigma_m": 1500.0,
+    "n_communities": 7,
+    "community_sizes": [
+      726,
+      660,
+      429,
+      407,
+      350,
+      185,
+      4
+    ],
+    "modularity": 0.6418683036592532,
+    "spectral_variant_modularity": 0.4112674897978353,
+    "spectral_variant_largest_share_pct": 62.368706990220936,
+    "spectral_variant_note": "spectral clustering on the raw affinity degenerates into one dominant community; the K-Means++ variant below is used as the reported baseline"
+  },
+  "our_balance": {
+    "mean_abs_net_balance": 0.022498452318717947,
+    "max_abs_net_balance": 0.10175695461200586,
+    "per_community": {
+      "0": {
+        "n_fences": 383,
+        "net_flow": -19.0,
+        "total_flow": 14135.0,
+        "balance": 0.0013441811107180756
+      },
+      "1": {
+        "n_fences": 766,
+        "net_flow": 112.0,
+        "total_flow": 31358.0,
+        "balance": 0.003571656355634926
+      },
+      "2": {
+        "n_fences": 336,
+        "net_flow": -151.0,
+        "total_flow": 19367.0,
+        "balance": 0.007796767697629989
+      },
+      "3": {
+        "n_fences": 316,
+        "net_flow": -242.0,
+        "total_flow": 9824.0,
+        "balance": 0.02463355048859935
+      },
+      "4": {
+        "n_fences": 345,
+        "net_flow": 178.0,
+        "total_flow": 15750.0,
+        "balance": 0.011301587301587302
+      },
+      "5": {
+        "n_fences": 526,
+        "net_flow": -156.0,
+        "total_flow": 22020.0,
+        "balance": 0.007084468664850136
+      },
+      "6": {
+        "n_fences": 89,
+        "net_flow": 278.0,
+        "total_flow": 2732.0,
+        "balance": 0.10175695461200586
+      }
+    }
+  },
+  "baseline_balance": {
+    "mean_abs_net_balance": 0.08705364961186382,
+    "max_abs_net_balance": 0.275,
+    "per_community": {
+      "0": {
+        "n_fences": 660,
+        "net_flow": 625.0,
+        "total_flow": 27871.0,
+        "balance": 0.022424742563955366
+      },
+      "1": {
+        "n_fences": 407,
+        "net_flow": 1817.0,
+        "total_flow": 19403.0,
+        "balance": 0.09364531258052879
+      },
+      "2": {
+        "n_fences": 185,
+        "net_flow": -953.0,
+        "total_flow": 6549.0,
+        "balance": 0.1455183997556879
+      },
+      "3": {
+        "n_fences": 350,
+        "net_flow": -184.0,
+        "total_flow": 19890.0,
+        "balance": 0.009250879839115133
+      },
+      "4": {
+        "n_fences": 4,
+        "net_flow": 22.0,
+        "total_flow": 80.0,
+        "balance": 0.275
+      },
+      "5": {
+        "n_fences": 429,
+        "net_flow": -425.0,
+        "total_flow": 13753.0,
+        "balance": 0.030902348578491966
+      },
+      "6": {
+        "n_fences": 726,
+        "net_flow": -902.0,
+        "total_flow": 27640.0,
+        "balance": 0.032633863965267726
+      }
+    }
+  },
+  "nodes": 2761,
+  "edges": 37488,
+  "min_fence_flow": 20,
+  "silhouette_ours": 0.29767415004399084,
+  "silhouette_baseline": 0.3001429357769703,
+  "note": "communities are descriptive groupings of the OD flow network, not administrative districts"
+}

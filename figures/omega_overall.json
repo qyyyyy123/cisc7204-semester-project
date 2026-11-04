@@ -1,0 +1,43 @@
+{
+  "note": "measured on trajectory geometry; detour factor omega = path_len / straight_len",
+  "method": "primary: continuous tracking episode (same bicycle, gap <= 600 s); cross-check: fixes inside each OD trip window",
+  "n_episodes_all": 49326,
+  "n_omega": 29668,
+  "filters": {
+    "min_points": 5,
+    "min_straight_m": 200.0,
+    "omega_range": [
+      1.0,
+      4.0
+    ],
+    "max_gap_sec": 600
+  },
+  "mean": 1.4933744188854376,
+  "mean_ci95_bootstrap": [
+    1.486799389708096,
+    1.4999562200627952
+  ],
+  "median": 1.2993560699948659,
+  "median_ci95_bootstrap": [
+    1.2961268153492396,
+    1.3022847403463071
+  ],
+  "std": 0.5551260441050976,
+  "q25": 1.1623180092191607,
+  "q75": 1.5612835466809556,
+  "q95": 2.8159425997168177,
+  "share_below_1529": 73.45624915734125,
+  "share_above_1529": 26.54375084265876,
+  "reference_value_borrowed_by_paper": 1.529,
+  "bootstrap_replicates": 1000,
+  "path_len_median_m": 1143.816476638246,
+  "straight_len_median_m": 807.188947368649,
+  "episode_duration_median_min": 5.833333333333333,
+  "median_points_per_episode": 24.0,
+  "od_window_crosscheck": {
+    "n": 2456,
+    "mean": 1.377304208738873,
+    "median": 1.2205136577613687,
+    "note": "same ratio restricted to the M2 OD trip window; the sample is smaller because the trajectory files cover only part of each bicycle's day"
+  }
+}

@@ -1,0 +1,21 @@
+# The input archive is third-party, 96 MB and CC BY-NC 4.0: it is downloaded, never committed.
+Shared bicycle data.zip
+raw/
+
+# Parse cache and workspace-local optional dependencies
+.cache/
+.pylibs/
+.tmp/
+__pycache__/
+tmp_mode_*/
+
+# Python
+*.pyc
+.venv/
+venv/
+
+# Editor / OS noise
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,114 @@
+{
+  "note": "reproduction check for pipeline validation, not our finding",
+  "checks": [
+    {
+      "check": "trips with duration in [60, 3600] s",
+      "paper_value": 212630,
+      "actual_value": 212680,
+      "difference_pct": 0.024,
+      "tolerance": "+-5%",
+      "passed": true
+    },
+    {
+      "check": "cross-day demand curve Pearson r (mean over day pairs)",
+      "paper_value": "> 0.90",
+      "actual_value": 0.9873,
+      "difference_pct": null,
+      "tolerance": "> 0.90",
+      "passed": true
+    },
+    {
+      "check": "morning peak hour",
+      "paper_value": "08:00-09:00",
+      "actual_value": "08:00-09:00",
+      "difference_pct": null,
+      "tolerance": "peak inside 08:00-09:00",
+      "passed": true
+    },
+    {
+      "check": "rainy day (2020-12-23) total-trip drop vs other days",
+      "paper_value": "about -60%",
+      "actual_value": 61.86,
+      "difference_pct": null,
+      "tolerance": "direction only (must fall)",
+      "passed": true
+    }
+  ],
+  "details": {
+    "n_trips": 212680,
+    "paper_n_trips": 212630,
+    "cross_day_r_mean": 0.9873362805492679,
+    "cross_day_r_min": 0.9626649719228316,
+    "cross_day_pairs": [
+      [
+        "2020-12-21",
+        "2020-12-22",
+        0.9994886324493079
+      ],
+      [
+        "2020-12-21",
+        "2020-12-23",
+        0.978795473371292
+      ],
+      [
+        "2020-12-21",
+        "2020-12-24",
+        0.9951218904722022
+      ],
+      [
+        "2020-12-21",
+        "2020-12-25",
+        0.9980586398361813
+      ],
+      [
+        "2020-12-22",
+        "2020-12-23",
+        0.9764198980731358
+      ],
+      [
+        "2020-12-22",
+        "2020-12-24",
+        0.9975141966742469
+      ],
+      [
+        "2020-12-22",
+        "2020-12-25",
+        0.9973097582054112
+      ],
+      [
+        "2020-12-23",
+        "2020-12-24",
+        0.9626649719228316
+      ],
+      [
+        "2020-12-23",
+        "2020-12-25",
+        0.9767487052705995
+      ],
+      [
+        "2020-12-24",
+        "2020-12-25",
+        0.991240639217472
+      ]
+    ],
+    "daily_totals": {
+      "2020-12-21": 49417,
+      "2020-12-22": 52194,
+      "2020-12-23": 18514,
+      "2020-12-24": 47575,
+      "2020-12-25": 44980
+    },
+    "hourly_totals": {
+      "6": 17046,
+      "7": 69224,
+      "8": 95831,
+      "9": 30579
+    },
+    "peak_hour": 8,
+    "peak_hour_share_pct": 45.05877374459282,
+    "rainy_day_total": 18514.0,
+    "other_days_mean": 48541.5,
+    "rainy_drop_pct": 61.85943986073772,
+    "all_passed": true
+  }
+}

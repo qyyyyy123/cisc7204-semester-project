@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this code or these findings, please cite the work as below."
+title: "Xiamen Shared-Bicycle Tidal Imbalance: measuring the detour factor and rebalancing zones from five mornings of GPS data"
+abstract: >-
+  Reconstructs 212,680 bike-share trips from five mornings of Xiamen order, fence, trajectory
+  and weather data, measures the detour factor omega from 2,849,243 GPS fixes, and compares a
+  flow-based community partition of the origin-destination network against a published
+  distance-plus-demand affinity clustering. All code is reproducible from a single entry point.
+authors:
+  - family-names: Qu
+    given-names: Ying
+    affiliation: "University of Macau"
+    orcid: ""
+version: "1.0.0"
+date-released: "2026-11-04"
+license: MIT
+repository-code: "https://github.com/qyyyyy123/xiamen-shared-bicycle-analysis"
+keywords:
+  - bike sharing
+  - rebalancing
+  - GPS trajectories
+  - spatial autocorrelation
+  - community detection
+  - reproducible research
+references:
+  - type: dataset
+    title: "Shared bicycle data (Xiamen, 2020-12-21 to 2020-12-25)"
+    doi: "10.5281/zenodo.17415891"
+    notes: "CC BY-NC 4.0. Not redistributed in this repository."

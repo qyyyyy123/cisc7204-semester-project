@@ -1,0 +1,81 @@
+{
+  "stage_order": [
+    "M0",
+    "M1",
+    "M2",
+    "M3",
+    "M4",
+    "M5",
+    "M6",
+    "M7",
+    "M9",
+    "M8",
+    "M10",
+    "M11"
+  ],
+  "timings": [
+    {
+      "stage": "M0",
+      "seconds": 3.62,
+      "rss_mb": 265.7
+    },
+    {
+      "stage": "M1",
+      "seconds": 6.83,
+      "rss_mb": 174.0
+    },
+    {
+      "stage": "M2",
+      "seconds": 2.06,
+      "rss_mb": 200.0
+    },
+    {
+      "stage": "M3",
+      "seconds": 9.97,
+      "rss_mb": 223.1
+    },
+    {
+      "stage": "M4",
+      "seconds": 0.01,
+      "rss_mb": 223.2
+    },
+    {
+      "stage": "M5",
+      "seconds": 0.2,
+      "rss_mb": 221.5
+    },
+    {
+      "stage": "M6",
+      "seconds": 0.45,
+      "rss_mb": 230.2
+    },
+    {
+      "stage": "M7",
+      "seconds": 2.58,
+      "rss_mb": 248.5
+    },
+    {
+      "stage": "M9",
+      "seconds": 10.94,
+      "rss_mb": 350.8
+    },
+    {
+      "stage": "M8",
+      "seconds": 7.35,
+      "rss_mb": 370.1
+    },
+    {
+      "stage": "M10",
+      "seconds": 5.42,
+      "rss_mb": 372.2
+    },
+    {
+      "stage": "M11",
+      "seconds": 3.31,
+      "rss_mb": 391.8
+    }
+  ],
+  "failures": [],
+  "skipped_figures": [],
+  "total_minutes": 0.88
+}

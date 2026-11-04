@@ -1,0 +1,15 @@
+# Core analysis stack (pipeline M0-M11, notebook)
+# Tested on Python 3.14.7 with the versions in the trailing comment.
+pandas>=2.0            # 3.0.5
+numpy>=1.24            # 2.5.3
+scipy>=1.10            # 1.18.1  (Kruskal-Wallis, Welch ANOVA, cKDTree)
+matplotlib>=3.7        # 3.11.2  (all figures; no seaborn anywhere)
+scikit-learn>=1.3      # 1.9.1   (HistGradientBoosting, KMeans, SpectralClustering, silhouette)
+networkx>=3.0          # 3.7     (Louvain community detection on the OD graph)
+openpyxl>=3.1          # 3.1.5   the archive ships ".csv" files that are really OOXML workbooks
+folium>=0.14           # 0.20.0  interactive tidal map (M11)
+psutil>=5.9            # 7.2.2   per-stage wall time / peak memory in pipeline_log.json
+
+# Interactive dashboard only (dash_app.py). The analysis pipeline does not import these.
+plotly>=5.18           # 7.1.0
+dash>=2.14             # 4.4.1

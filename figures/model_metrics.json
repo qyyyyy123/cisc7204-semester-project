@@ -1,0 +1,151 @@
+{
+  "model": "HistGradientBoostingRegressor(max_iter=300, lr=0.06, leaves=31, min_samples_leaf=20, l2=1.0)",
+  "target": "n_pickup per fence x 30-minute cell",
+  "features": [
+    "community",
+    "hour",
+    "dow",
+    "halfhour",
+    "lag1_same_day",
+    "lag_prev_day",
+    "hist_mean",
+    "hist_n_days",
+    "temp",
+    "wind",
+    "humidity"
+  ],
+  "validation_scheme": "leave-one-day-out (5 folds, grouped by date; no random K-fold -> no temporal leakage). The 'validation' block below holds the pooled out-of-fold metrics.",
+  "train": {
+    "n": 1400,
+    "mae": 2.483952751082581,
+    "rmse": 3.603696782786387,
+    "r2": 0.7840246558321251,
+    "pearson_r": 0.8866686489267831
+  },
+  "validation": {
+    "n": 1738,
+    "mae": 3.7297729231113648,
+    "rmse": 5.833540782431365,
+    "r2": 0.4299803814737755,
+    "pearson_r": 0.6697408787516862,
+    "folds": 5
+  },
+  "test": {
+    "n": 338,
+    "mae": 2.733808977920124,
+    "rmse": 4.138255675760495,
+    "r2": 0.7043233167201055,
+    "pearson_r": 0.8493953336145131
+  },
+  "test_date": "2020-12-25",
+  "folds": [
+    {
+      "n": 427,
+      "mae": 4.3881585659988795,
+      "rmse": 6.37527869371735,
+      "r2": 0.2279661508731482,
+      "pearson_r": 0.49862721897170786,
+      "held_out_date": "2020-12-21",
+      "n_train": 1311
+    },
+    {
+      "n": 483,
+      "mae": 3.543310143126176,
+      "rmse": 5.566649763845265,
+      "r2": 0.543028474553144,
+      "pearson_r": 0.7493118756045666,
+      "held_out_date": "2020-12-22",
+      "n_train": 1255
+    },
+    {
+      "n": 84,
+      "mae": 6.229289419182826,
+      "rmse": 9.45608727001325,
+      "r2": -1.469946289576932,
+      "pearson_r": 0.8137888525200142,
+      "held_out_date": "2020-12-23",
+      "n_train": 1654
+    },
+    {
+      "n": 406,
+      "mae": 3.571170167014106,
+      "rmse": 5.771305124583214,
+      "r2": 0.47614475199181105,
+      "pearson_r": 0.7612141791130922,
+      "held_out_date": "2020-12-24",
+      "n_train": 1332
+    },
+    {
+      "n": 338,
+      "mae": 2.733808977920124,
+      "rmse": 4.138255675760495,
+      "r2": 0.7043233167201055,
+      "pearson_r": 0.8493953336145131,
+      "held_out_date": "2020-12-25",
+      "n_train": 1400
+    }
+  ],
+  "fold_mae_mean": 4.093147454648422,
+  "fold_mae_std": 1.32972896681309,
+  "feature_importance": [
+    {
+      "feature": "hist_mean",
+      "mae_increase": 3.117677573938388,
+      "std": 0.1286635512922708
+    },
+    {
+      "feature": "lag1_same_day",
+      "mae_increase": 0.9727718544123827,
+      "std": 0.047872271077298426
+    },
+    {
+      "feature": "hour",
+      "mae_increase": 0.14650617158459206,
+      "std": 0.054175635596640466
+    },
+    {
+      "feature": "halfhour",
+      "mae_increase": 0.13653600328569784,
+      "std": 0.04800063894040653
+    },
+    {
+      "feature": "lag_prev_day",
+      "mae_increase": 0.08966047885077204,
+      "std": 0.044908101210381225
+    },
+    {
+      "feature": "community",
+      "mae_increase": 0.05239466418428869,
+      "std": 0.02534194947680535
+    },
+    {
+      "feature": "wind",
+      "mae_increase": 0.010430406286094217,
+      "std": 0.00720740004210203
+    },
+    {
+      "feature": "temp",
+      "mae_increase": 0.008496349445500862,
+      "std": 0.004864364403057481
+    },
+    {
+      "feature": "dow",
+      "mae_increase": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "humidity",
+      "mae_increase": 0.0,
+      "std": 0.0
+    },
+    {
+      "feature": "hist_n_days",
+      "mae_increase": -0.012295389641352728,
+      "std": 0.009841667795667646
+    }
+  ],
+  "caveat": "not directly comparable to the published BPNN: that model used 152 training and 8 test observations with a random split, while this pipeline uses date-grouped cross-validation on a much larger panel; the two designs answer different questions.",
+  "weather_note": "weather variables are control variables only; not causal",
+  "n_rows": 1738,
+  "n_fences": 405
+}
