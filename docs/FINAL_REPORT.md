@@ -2,7 +2,7 @@
 
 **CISC7204 semester project, Class B - Team 02**
 
-Generated: 2026-11-04 15:28 (Asia/Shanghai)  
+Generated: 2026-11-04 15:31 (Asia/Shanghai)  
 Dataset: `Shared bicycle data.zip` (Zenodo 10.5281/zenodo.17415891, CC BY-NC 4.0)  
 Code: `xm_core.py`, `run_pipeline.py`, `dash_app.py`, `Xiamen_SharedBicycle_Analysis.ipynb`
 
@@ -246,6 +246,15 @@ is grouped by date, and eight randomly chosen test points are not a held-out mor
 statement is the one above: r = 0.849 on an unseen morning.
 
 *Figures:* `fig_pred_scatter.png`, `fig_feature_importance.png`. Data: `model_metrics.json`.
+
+**Why there are two MAE values for the same model.** The `validation` row above pools all
+5 leave-one-day-out folds (n = 1,738), giving MAE 3.730. The left panel of `fig_pred_scatter.png`
+shows only the 4 folds that keep the future test day (2020-12-25) out of the picture (n = 1,400); weighted by fold size those
+folds give MAE 3.970, which is the figure's headline. Neither number is wrong: the
+figure isolates the training-day population, the table pools every fold. R2 and r are not compared
+across the two because a pooled out-of-fold R2 is not the average of the per-fold R2 values; both
+populations print their own R2 and r on the figure and in the table, so neither can be quoted out
+of context.
 
 ---
 

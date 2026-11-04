@@ -468,6 +468,29 @@ def main() -> None:
     A("")
     A("*Figures:* `fig_pred_scatter.png`, `fig_feature_importance.png`. Data: `model_metrics.json`.")
     A("")
+
+    # A reader who compares fig_pred_scatter.png with the table above sees two different
+    # MAE values (3.970 vs 3.730). They are different populations, not a contradiction, so the
+    # report states both explicitly instead of leaving the reader to guess. Computed from the
+    # folds below rather than hard-coded, so the note cannot go stale.
+    train_folds = [
+        f for f in model.get("folds", []) if f.get("held_out_date") != model.get("test_date")
+    ]
+    if train_folds:
+        n_tf = sum(f["n"] for f in train_folds)
+        mae_tf = sum(f["mae"] * f["n"] for f in train_folds) / n_tf
+        A("**Why there are two MAE values for the same model.** The `validation` row above pools all")
+        A(f"{model.get('validation', {}).get('folds', len(model.get('folds', [])))} leave-one-day-out folds "
+          f"(n = {int(model.get('validation', {}).get('n', 0)):,}), giving MAE "
+          f"{fnum(model.get('validation', {}).get('mae'), 3)}. The left panel of `fig_pred_scatter.png`")
+        A(f"shows only the {len(train_folds)} folds that keep the future test day "
+          f"({model.get('test_date')}) out of the picture (n = {n_tf:,}); weighted by fold size those")
+        A(f"folds give MAE {fnum(mae_tf, 3)}, which is the figure's headline. Neither number is wrong: the")
+        A("figure isolates the training-day population, the table pools every fold. R2 and r are not compared")
+        A("across the two because a pooled out-of-fold R2 is not the average of the per-fold R2 values; both")
+        A("populations print their own R2 and r on the figure and in the table, so neither can be quoted out")
+        A("of context.")
+        A("")
     A("---")
     A("")
 
