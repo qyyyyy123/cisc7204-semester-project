@@ -203,10 +203,10 @@ reproduction check comparable.
         code(
             """
 trips = pd.read_csv(FIG_DIR / "od_trips.csv", parse_dates=["start_time", "end_time"])
-print(f"trips kept: {len(od):,}")
+print(f"trips kept: {len(trips):,}")
 print(trips[["duration_s", "dist_m", "speed_mps"]].describe().round(3).to_string())
 print()
-print("median implied speed (m/s):", round(od.speed_mps.median(), 3))
+print("median implied speed (m/s):", round(trips.speed_mps.median(), 3))
 trips.head()
 """
         )
@@ -285,12 +285,23 @@ may be read causally.
     cells.append(
         code(
             """
-weather = xc.load_weather()
-print("hourly rows:", len(weather))
-print(weather[["temp", "precip", "wind", "humidity", "visibility"]].isna().mean().round(3).to_string())
-print()
-print("daily precipitation total (mm), control variable only; not causal:")
-print(weather.groupby(weather.ts.dt.date).precip.sum().to_string())
+try:
+    weather = xc.load_weather()
+    print("hourly rows:", len(weather))
+    print(weather[["temp", "precip", "wind", "humidity", "visibility"]].isna().mean().round(3).to_string())
+    print()
+    print("daily precipitation total (mm), control variable only; not causal:")
+    print(weather.groupby(weather.ts.dt.date).precip.sum().to_string())
+except FileNotFoundError:
+    # The notebook is meant to run from the committed artifacts alone; the hourly
+    # weather table lives in the source archive, which this repository does not
+    # redistribute. Show the weather columns the committed panel does carry.
+    print("raw/ is not present in this checkout, so the hourly table cannot be read.")
+    print("The weather columns the committed panel carries are:")
+    panel = pd.read_csv(FIG_DIR / "panel_fence_halfhour.csv")
+    print(panel[["temp", "precip", "wind", "humidity", "visibility"]].isna().mean().round(3).to_string())
+    print()
+    print("precip is empty in the source archive; weather is a control variable only, not causal")
 """
         )
     )

@@ -87,7 +87,11 @@ Anything beyond the last decimal place means a *substantive* difference, not dri
 | Claim | How it was verified |
 |---|---|
 | `pip install -r requirements.txt` is sufficient | Imported `xm_core` in a clean interpreter after installing only these packages; all 11 stages ran |
-| The notebook runs from the committed artifacts | Executed top to bottom with the raw archive absent from the working directory |
+| The notebook runs from the committed artifacts | All 25 code cells executed in order with `raw/` absent: 25/25 passed. Two defects were found and fixed in `tools/make_notebook.py` on the way — the M2 cell referenced an undefined `od` (it reads `trips`), and the weather cell assumed `raw/` was present and now degrades to the committed panel |
 | The extraction step works from the documented archive | Ran `run_pipeline.py` from a clean checkout holding only `Shared bicycle data.zip` |
 | The dashboard starts | `python dash_app.py`, served on port 8050 |
 | The map opens | Opened `figures/folium_tidal_map.html` (3.6 MB, under the 20 MB budget) |
+
+The notebook run was executed by importing the cells one by one into a plain interpreter
+rather than through Jupyter, because `jupyter_core` sets an ACL on its runtime directory
+that this build environment refuses; the code path a reader would run is the same.
