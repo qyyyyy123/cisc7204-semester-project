@@ -1,13 +1,23 @@
 # The input archive is third-party, 96 MB and CC BY-NC 4.0: it is downloaded, never committed.
 Shared bicycle data.zip
+data/Shared bicycle data.zip
+data/*.zip
 raw/
 
-# Parse cache and workspace-local optional dependencies
+# Parse cache and bundled optional dependencies (the repo installs from requirements.txt instead)
 .cache/
 .pylibs/
 .tmp/
 __pycache__/
 tmp_mode_*/
+
+# Streaming-dashboard runtime leftovers
+dashboard/**/__pycache__/
+dashboard/**/*.pyc
+dashboard/logs/
+dashboard/**/logs/
+dashboard/.env
+*.log
 
 # Python
 *.pyc

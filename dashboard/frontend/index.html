@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xiamen Bike-Sharing Tidal Analysis &middot; Live Dashboard</title>
+    <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="screen">
+
+    <!-- ============ Top bar ============ -->
+    <header class="topbar">
+        <div class="brand">
+            <div class="logo"></div>
+            <div class="titles">
+                <h1>Xiamen Bike-Sharing Tidal Analysis</h1>
+                <p>2020-12-21 ~ 12-25 morning peak 06:00&ndash;10:00 &middot; Kafka &rarr; Spark Streaming &rarr; MySQL &rarr; WebSocket</p>
+            </div>
+        </div>
+
+        <div class="stat-group">
+            <div class="stat"><span class="stat-label">Window</span><span class="stat-value" id="stat-window">--</span></div>
+            <div class="stat"><span class="stat-label">Borrows</span><span class="stat-value c-borrow" id="stat-borrow">0</span></div>
+            <div class="stat"><span class="stat-label">Returns</span><span class="stat-value c-return" id="stat-return">0</span></div>
+            <div class="stat"><span class="stat-label">Net Flow</span><span class="stat-value" id="stat-net">0</span></div>
+            <div class="stat"><span class="stat-label">Active Fences</span><span class="stat-value" id="stat-fence">0</span></div>
+            <div class="stat"><span class="stat-label">Tide Index E(t)</span><span class="stat-value c-eti" id="stat-eti">0%</span></div>
+        </div>
+
+        <div class="conn">
+            <span class="dot" id="conn-dot"></span>
+            <span id="conn-text">Disconnected</span>
+        </div>
+    </header>
+
+    <!-- ============ Main ============ -->
+    <main class="body">
+        <!-- Map -->
+        <section class="panel map-panel">
+            <div class="panel-head">
+                <h2>Net Flow by Fence</h2>
+                <div class="legend">
+                    <span class="lg-item"><i class="sw sw-blue"></i>Shortage (borrows &gt; returns)</span>
+                    <span class="lg-item"><i class="sw sw-neutral"></i>Balanced</span>
+                    <span class="lg-item"><i class="sw sw-red"></i>Surplus (returns &gt; borrows)</span>
+                    <span class="lg-item small">radius = imbalance strength</span>
+                </div>
+            </div>
+            <div id="map"></div>
+            <div class="map-tools">
+                <button class="mini-btn active" data-layer="dark">Dark</button>
+                <button class="mini-btn" data-layer="amap">Amap</button>
+                <button class="mini-btn" data-layer="none">None</button>
+            </div>
+        </section>
+
+        <!-- Right sidebar -->
+        <aside class="side">
+            <section class="panel weather-panel">
+                <div class="panel-head"><h2>Current Weather</h2></div>
+                <div class="weather-box" id="weather-box">
+                    <div class="w-loading">Loading&hellip;</div>
+                </div>
+            </section>
+
+            <section class="panel side-chart">
+                <div class="panel-head"><h2>Weather Effect</h2></div>
+                <div id="chart-weather"></div>
+            </section>
+
+            <section class="panel rank-panel">
+                <div class="panel-head">
+                    <h2>Top Imbalance</h2>
+                    <div class="seg">
+                        <button class="mini-btn active" id="rank-short">Most Short</button>
+                        <button class="mini-btn" id="rank-surge">Most Surplus</button>
+                    </div>
+                </div>
+                <ul class="rank-list" id="rank-list"></ul>
+            </section>
+        </aside>
+    </main>
+
+    <!-- ============ Time series ============ -->
+    <section class="panel tide-panel">
+        <div class="panel-head">
+            <h2>Citywide Tidal Time Series</h2>
+            <span class="hint">Tide index E(t) = &Sigma;|net flow| / &Sigma;rides &mdash; how imbalanced a window is</span>
+        </div>
+        <div id="chart-tide"></div>
+    </section>
+
+    <!-- ============ Playback ============ -->
+    <footer class="player">
+        <button class="ctrl-btn play" id="btn-play"><span id="play-icon">&#9654;</span></button>
+        <button class="ctrl-btn" id="btn-prev" title="Previous window">&#9666;&#9666;</button>
+        <button class="ctrl-btn" id="btn-next" title="Next window">&#9656;&#9656;</button>
+
+        <div class="time-now">
+            <span class="big" id="now-time">--:--</span>
+            <span class="sub" id="now-meta">Waiting for data&hellip;</span>
+        </div>
+
+        <div class="progress">
+            <input type="range" id="range" min="0" max="100" value="0" step="1">
+            <div class="range-marks" id="range-marks"></div>
+        </div>
+
+        <div class="speeds">
+            <button class="mini-btn" data-speed="1">1x</button>
+            <button class="mini-btn active" data-speed="2">2x</button>
+            <button class="mini-btn" data-speed="5">5x</button>
+        </div>
+
+        <label class="live-toggle">
+            <input type="checkbox" id="chk-live">
+            <span>Follow live</span>
+        </label>
+    </footer>
+</div>
+
+<script src="vendor/echarts/echarts.min.js"></script>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/map.js"></script>
+<script src="js/chart.js"></script>
+<script src="js/websocket.js"></script>
+<script src="js/playback.js"></script>
+<script>
+    /* ============================================================
+     * Orchestration: fetch data -> update map / charts / stats -> playback
+     * ============================================================ */
+    (function () {
+        const $ = (id) => document.getElementById(id);
+        const API = (location.protocol === 'file:') ? 'http://localhost:8000' : '';
+
+        const state = {
+            windows: [],          // window list
+            series: [],           // time series
+            index: 0,
+            rankMode: 'short',    // short = shortage, surge = surplus
+            currentRows: []
+        };
+
+        const EM_DASH = '\u2014';
+
+        function fmtWindow(w) {
+            if (!w) return '--';
+            const d = new Date(w.replace(' ', 'T'));
+            const p = (n) => String(n).padStart(2, '0');
+            return `${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+        }
+
+        // ---------- Render ----------
+        function renderAll(windowStart, rows) {
+            state.currentRows = rows || [];
+            $('stat-window').textContent = fmtWindow(windowStart);
+            if (!$('now-time').dataset.manual) {
+                $('now-time').textContent = windowStart ? windowStart.slice(11, 16) : '--:--';
+            }
+            $('now-meta').textContent = windowStart ? windowStart.slice(0, 10) + ' morning-peak window' : 'Waiting for data\u2026';
+
+            let b = 0, r = 0, imb = 0;
+            rows.forEach(x => { b += x.borrow_count; r += x.return_count; imb += Math.abs(x.net_flow); });
+            $('stat-borrow').textContent = b.toLocaleString();
+            $('stat-return').textContent = r.toLocaleString();
+            const net = r - b;
+            const netEl = $('stat-net');
+            netEl.textContent = (net > 0 ? '+' : '') + net.toLocaleString();
+            netEl.className = 'stat-value ' + (net > 0 ? 'c-red' : (net < 0 ? 'c-blue' : ''));
+            $('stat-fence').textContent = rows.length.toLocaleString();
+            const eti = (b + r) > 0 ? (imb * 100 / (b + r)) : 0;
+            $('stat-eti').textContent = eti.toFixed(1) + '%';
+
+            BikeMap.render(rows);
+            BikeChart.markCurrent(windowStart);
+            renderRank(state.rankMode);
+            loadWeather(windowStart);
+        }
+
+        function renderRank(mode) {
+            const rows = state.currentRows.slice();
+            if (!rows.length) return;
+            rows.sort((a, b) => mode === 'short' ? a.net_flow - b.net_flow : b.net_flow - a.net_flow);
+            const maxAbs = Math.max(1, ...rows.slice(0, 8).map(r => Math.abs(r.net_flow)));
+            $('rank-list').innerHTML = rows.slice(0, 8).map((r, i) => {
+                const pct = Math.min(100, Math.abs(r.net_flow) * 100 / maxAbs);
+                const cls = r.net_flow > 0 ? 'surge' : 'short';
+                return `<li class="rank-item ${cls}">
+                    <span class="no">${i + 1}</span>
+                    <span class="fid" title="${r.fence_id}">${r.fence_id}</span>
+                    <span class="bar"><i style="width:${pct}%"></i></span>
+                    <span class="val">${r.net_flow > 0 ? '+' : ''}${r.net_flow}</span>
+                </li>`;
+            }).join('');
+        }
+
+        async function loadWeather(w) {
+            const box = $('weather-box');
+            try {
+                const d = await fetch(`${API}/api/weather${w ? '?window=' + encodeURIComponent(w) : ''}`).then(r => r.json());
+                BikeChart.setWeatherCompare(d.compare || []);
+                const c = d.current || {};
+                if (!c.weather_type) {
+                    box.innerHTML = '<div class="w-loading">No weather data for this window</div>';
+                    return;
+                }
+                const num = (v, suffix) => (v != null ? v.toFixed(1) + suffix : EM_DASH);
+                box.innerHTML = `
+                <div class="w-main">
+                    <div class="w-type">${I18N.weatherIcon(c.weather_type)} ${I18N.weather(c.weather_type)}</div>
+                    <div class="w-temp">${num(c.weather_temp, '\u00B0C')}</div>
+                </div>
+                <div class="w-grid">
+                    <div><span>Precip.</span><b>${num(c.weather_rain, ' mm')}</b></div>
+                    <div><span>Visibility</span><b>${num(c.weather_visibility, ' km')}</b></div>
+                    <div><span>Hour</span><b>${c.hour != null ? c.hour + ':00' : EM_DASH}</b></div>
+                    <div><span>Date</span><b>${c.date || EM_DASH}</b></div>
+                </div>`;
+            } catch (e) {
+                box.innerHTML = '<div class="w-loading">Weather API unavailable</div>';
+            }
+        }
+
+        async function loadWindows() {
+            try {
+                const [ws, sr] = await Promise.all([
+                    fetch(`${API}/api/windows`).then(r => r.json()),
+                    fetch(`${API}/api/series`).then(r => r.json())
+                ]);
+                state.windows = ws.map(w => w.window_start);
+                state.series = sr;
+                BikeChart.setSeries(sr);
+                BikePlay.setWindows(state.windows);
+                return state.windows.length;
+            } catch (e) {
+                return 0;
+            }
+        }
+
+        async function loadWindowAgg(w) {
+            const rows = await fetch(`${API}/api/agg?window=` + encodeURIComponent(w) + '&limit=8000')
+                .then(r => r.json());
+            renderAll(w, rows);
+        }
+
+        // ---------- Playback ----------
+        BikePlay.onSeek((i) => {
+            if (!state.windows.length) return;
+            state.index = Math.max(0, Math.min(i, state.windows.length - 1));
+            $('range').value = state.index;
+            loadWindowAgg(state.windows[state.index]);
+        });
+
+        $('range').addEventListener('input', (e) => {
+            BikePlay.pause();
+            state.index = parseInt(e.target.value, 10);
+            loadWindowAgg(state.windows[state.index]);
+        });
+
+        $('btn-prev').onclick = () => BikePlay.seek(state.index - 1);
+        $('btn-next').onclick = () => BikePlay.seek(state.index + 1);
+        $('btn-play').onclick = () => BikePlay.toggle();
+        BikePlay.onPlayState((playing) => {
+            $('play-icon').textContent = playing ? '\u275A\u275A' : '\u25B6';
+        });
+
+        document.querySelectorAll('[data-speed]').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('[data-speed]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                BikePlay.setSpeed(parseFloat(btn.dataset.speed));
+            };
+        });
+
+        $('rank-short').onclick = () => { state.rankMode = 'short'; toggleRank(state.rankMode); };
+        $('rank-surge').onclick = () => { state.rankMode = 'surge'; toggleRank(state.rankMode); };
+        function toggleRank(m) {
+            $('rank-short').classList.toggle('active', m === 'short');
+            $('rank-surge').classList.toggle('active', m === 'surge');
+            renderRank(m);
+        }
+
+        document.querySelectorAll('[data-layer]').forEach(btn => {
+            btn.onclick = () => {
+                document.querySelectorAll('[data-layer]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                BikeMap.switchLayer(btn.dataset.layer);
+            };
+        });
+
+        // ---------- WebSocket ----------
+        BikeWS.connect({
+            onOpen: () => { $('conn-dot').className = 'dot on'; $('conn-text').textContent = 'Live'; },
+            onClose: () => { $('conn-dot').className = 'dot off'; $('conn-text').textContent = 'Disconnected'; },
+            onWindow: async (w) => {
+                const live = $('chk-live').checked;
+                const n = await loadWindows();
+                if (!n) return;
+                if (live || state.index === 0) {
+                    const idx = state.windows.indexOf(w);
+                    BikePlay.pause();
+                    $('range').max = n - 1;
+                    $('range').value = idx >= 0 ? idx : n - 1;
+                    loadWindowAgg(state.windows[idx >= 0 ? idx : n - 1]);
+                }
+            }
+        });
+
+        $('chk-live').addEventListener('change', () => {
+            if ($('chk-live').checked) BikePlay.pause();
+        });
+
+        // ---------- Boot ----------
+        BikeMap.init('map');
+        BikeChart.init('chart-tide', 'chart-weather');
+        (async function boot() {
+            const n = await loadWindows();
+            if (n) {
+                $('range').max = n - 1;
+                state.index = n - 1;
+                $('range').value = n - 1;
+                loadWindowAgg(state.windows[n - 1]);
+            } else {
+                $('now-meta').textContent = 'No data yet \u2014 start the producer and the streaming job';
+            }
+            setInterval(loadWindowsIfNeeded, 4000);
+        })();
+
+        let lastCount = 0;
+        async function loadWindowsIfNeeded() {
+            const n = await loadWindows();
+            if (n && n !== lastCount) {
+                lastCount = n;
+                $('range').max = n - 1;
+            }
+        }
+    })();
+</script>
+</body>
+</html>

@@ -24,8 +24,9 @@ CISC7204 Data Science semester project · Class B, Team 02 · Qu Ying (MC641326)
 7. [Limitations](#7-limitations)
 8. [Reproducing the analysis](#8-reproducing-the-analysis)
 9. [Repository structure](#9-repository-structure)
-10. [Project status](#10-project-status)
-11. [Licence and citation](#11-licence-and-citation)
+10. [Interactive dashboards](#10-interactive-dashboards)
+11. [Project status](#11-project-status)
+12. [Licence and citation](#12-licence-and-citation)
 
 ---
 
@@ -116,7 +117,7 @@ The pipeline is one module per stage, `M0` → `M11`, all implemented from scrat
 | M8 | **Measured ω**: tracking episodes → path length ÷ chord, bootstrap 1000×, Kruskal–Wallis, Welch ANOVA, and a from-scratch HC1-robust OLS with zone + hour dummies | `omega_*.json/csv`, `fig_omega_*.png` |
 | M9 | OD network (`W = OD + ODᵀ`) → Louvain, benchmarked against a reproduced paper-style affinity + K-Means++ baseline | `community_*.csv/json`, `fig_community_map.png` |
 | M10 | `HistGradientBoostingRegressor` with **leave-one-day-out** grouped cross-validation (no random K-fold: it leaks the future) | `model_metrics.json`, `fig_pred_*.png` |
-| M11 | Interactive Folium map and a Plotly–Dash dashboard | `folium_tidal_map.html`, `dash_app.py` |
+| M11 | Interactive Folium map, and two dashboards: Plotly–Dash on the finished artifacts, and a live Kafka → Spark → MySQL → FastAPI replay ([§10](#10-interactive-dashboards)) | `folium_tidal_map.html`, `dash_app.py`, `dashboard/` |
 
 Two rules were held throughout, and both are visible in the code comments:
 
@@ -244,14 +245,26 @@ scikit-learn's thread pool to one worker, which is what makes histogram binning 
 ```
 .
 ├── README.md                          # this file
-├── requirements.txt
+├── requirements.txt                   # analysis pipeline + notebook + Plotly-Dash app
+├── requirements-dashboard.txt         # streaming dashboard (Kafka / Spark / MySQL / FastAPI)
 ├── LICENSE                            # MIT for the code; data is CC BY-NC 4.0
 ├── CITATION.cff
 │
 ├── xm_core.py                         # all modules M0–M11, from scratch (2,715 lines)
 ├── run_pipeline.py                    # one-command entry point, --skip-to M8 resume
-├── dash_app.py                        # Plotly–Dash dashboard (port 8050)
+├── dash_app.py                        # dashboard 1: Plotly–Dash, static artifacts (port 8050)
 ├── Xiamen_SharedBicycle_Analysis.ipynb# narrative notebook, M1–M11 in order
+│
+├── dashboard/                         # dashboard 2: live streaming stack
+│   ├── README.md                      # quick start, API list, troubleshooting
+│   ├── README_full_notes.md           # original design notes (Chinese)
+│   ├── docker-compose.yml             # Kafka, Zookeeper, MySQL, Redis
+│   ├── producer/                      # replays the historical orders as a Kafka stream
+│   ├── spark/                         # Structured Streaming aggregation
+│   ├── api/                           # FastAPI backend + WebSocket
+│   ├── frontend/                      # Leaflet map + ECharts, vendored libs (no CDN)
+│   ├── mysql/init/                    # schema, applied on first container start
+│   └── scripts/                       # run_producer.sh, run_consumer.sh, run_api.sh
 │
 ├── figures/                           # pipeline output directory: all figures + all artifacts
 │   ├── fig_*.png                      # 11 figures, dpi >= 150, English labels, units given
@@ -270,6 +283,8 @@ scikit-learn's thread pool to one worker, which is what makes histogram binning 
 │
 ├── docs/
 │   ├── FINAL_REPORT.md                # 11-section report: four RQs, all numbers, limitations
+│   ├── CODEBOOK.md                    # variables, derived measures, module map, artifact index
+│   ├── DATA_DESCRIPTION.md            # what the archive contains, field by field
 │   ├── REPRODUCIBILITY.md             # step-by-step verification route
 │   ├── EXPECTED_OUTPUTS.md            # numbers a correct run must reproduce
 │   ├── PEER_FEEDBACK.md               # review log: comment -> commit
@@ -280,7 +295,51 @@ scikit-learn's thread pool to one worker, which is what makes histogram binning 
     └── DATA_DICTIONARY.md             # the archive's own field/unit dictionary
 ```
 
-## 10. Project status
+## 10. Interactive dashboards
+
+The project ships **two** dashboards. They consume the same artifacts and are independent of each
+other; neither is needed to read the analysis.
+
+| | Dashboard 1 — `dash_app.py` | Dashboard 2 — `dashboard/` |
+|---|---|---|
+| Purpose | Explore the finished results | Show the morning *as it happens* |
+| Data path | reads the committed CSVs in `figures/` | replays `raw/Order data/order data.csv` |
+| Stack | Plotly + Dash | Kafka → Spark Structured Streaming → MySQL → FastAPI + WebSocket → Leaflet / ECharts |
+| Start | `python dash_app.py` → port 8050 | four terminals, see below → port 8000 |
+| Needs | `pip install -r requirements.txt` | Docker, Java 17, Spark 3.5.9, Python 3.10 (`requirements-dashboard.txt`) |
+| Controls | 30-minute slot slider, fence-role filter, demand curve, source/sink ranking | play/pause replay, fence filter, live net-flow map, ECharts time series, weather panel |
+
+**Dashboard 2** replays the real historical orders as a Kafka stream; nothing is simulated. Its
+front-end libraries (Leaflet, ECharts) are vendored under `dashboard/frontend/vendor/`, so the
+charts need no CDN — only map tiles need internet access.
+
+```bash
+# 0. once: python 3.10 env with requirements-dashboard.txt
+#    edit JAVA_HOME / SPARK_HOME / HADOOP_HOME / PY in dashboard/scripts/run_*.sh
+#    credentials: copy dashboard/.env.example to dashboard/.env and set two passwords
+#    (.env is git-ignored; no password is stored in this repository)
+
+# 1. infrastructure (MySQL schema applied automatically on first start)
+cd dashboard
+docker compose up -d
+cd ..
+
+# 2. Spark consumer - start first, so no batch is missed
+bash dashboard/scripts/run_consumer.sh
+
+# 3. Kafka producer - replay one day, or all five
+bash dashboard/scripts/run_producer.sh --date 2020-12-22
+
+# 4. FastAPI backend + static frontend
+bash dashboard/scripts/run_api.sh
+#    open http://127.0.0.1:8000
+```
+
+It reads the same `raw/` tree as the pipeline, so the raw archive must be extracted once first — see
+[§8 Reproducing the analysis](#8-reproducing-the-analysis). Full API list, architecture notes and
+troubleshooting: [`dashboard/README.md`](dashboard/README.md).
+
+## 11. Project status
 
 **Status: complete and submitted for CISC7204 (2026).** All 11 modules run end to end; the four
 research questions are answered with the numbers above; the limitations are stated rather than
@@ -295,7 +354,7 @@ Planned improvements, in priority order:
 3. Replace the borrowed ω with the empirical distribution inside an actual rebalancing optimiser, and
    report what the plan costs differently.
 
-## 11. Licence and citation
+## 12. Licence and citation
 
 * **Code** (`.py`, `.ipynb`, build scripts): MIT — see [`LICENSE`](LICENSE).
 * **Figures, reports, derived tables in this repository**: CC BY 4.0, please attribute.

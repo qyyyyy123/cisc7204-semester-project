@@ -1,0 +1,19 @@
+# Streaming dashboard only (dashboard/). The analysis pipeline does NOT need these.
+# Python 3.10 is what this stack was tested with; Java 17, Spark 3.5.9 (Hadoop 3 build)
+# and Docker Desktop are required as well - see dashboard/README.md.
+pyspark==3.5.9
+kafka-python>=2.0
+redis>=4.5
+mysql-connector-python>=8.0
+fastapi>=0.110
+uvicorn[standard]>=0.27
+websockets>=12.0
+findspark>=2.0
+chardet>=5.0
+
+# Shared with the analysis side
+pandas>=2.0
+openpyxl>=3.1
+
+# Only if the producer/consumer scripts read raw fence geometry directly
+shapely>=2.0
