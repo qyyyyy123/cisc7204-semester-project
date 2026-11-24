@@ -14,7 +14,7 @@ authors:
 version: "1.0.0"
 date-released: "2026-11-04"
 license: MIT
-repository-code: "https://github.com/qyyyyy123/xiamen-shared-bicycle-analysis"
+repository-code: "https://github.com/qyyyyy123/cisc7204-semester-project"
 keywords:
   - bike sharing
   - rebalancing

@@ -65,7 +65,7 @@ not credited with work it did not do. The two that touch this repository are:
 
 | Issue found in self-review | Fix | Commit |
 |---|---|---|
-| The prediction figure said MAE 3.970 while the metrics table said 3.730 | Both correct; different fold populations. `tools/make_report.py` now emits the explanation, computed from `model_metrics.json`, so it cannot drift again | `4a6d985` — <https://github.com/qyyyyy123/xiamen-shared-bicycle-analysis/commit/4a6d985> |
+| The prediction figure said MAE 3.970 while the metrics table said 3.730 | Both correct; different fold populations. `tools/make_report.py` now emits the explanation, computed from `model_metrics.json`, so it cannot drift again | `4a6d985` — <https://github.com/qyyyyy123/cisc7204-semester-project/commit/4a6d985> |
 | Nothing stated what the data licence allows | Licence, CC BY-NC 4.0 attribution, SHA-256 of the archive, explicit "not redistributed" statement | `c936ce8` (initial commit) |
 
 ## One suggestion declined

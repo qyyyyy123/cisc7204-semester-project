@@ -39,7 +39,7 @@ record was downloaded; the pipeline will still run, but the numbers in
 Put the archive in the **repository root**, next to `run_pipeline.py`:
 
 ```
-xiamen-shared-bicycle-analysis/
+cisc7204-semester-project/
 ├── Shared bicycle data.zip     <- here
 ├── run_pipeline.py
 └── ...
